@@ -8,6 +8,9 @@
 #define INPUT_MAX 50
 
 int main (int argc, char ** argv ) {
+
+	/* manymany decls */
+	char (*result)[CURRENT_MAX];
 	char inp[INPUT_MAX];
 	char * end;
 	FILE * tty;
@@ -16,6 +19,10 @@ int main (int argc, char ** argv ) {
 	int i;
 	int selection;
 
+	/* Process command line arguments
+	*  we currently only support -##
+	*  FIXME: should have usage message.
+	*/
 	for(i=1; i < argc; i++) {
 		if(argv[i][0]=='-'){
 			num=atoi(argv[i])*-1;
@@ -26,16 +33,20 @@ int main (int argc, char ** argv ) {
 		}
 	}
 
-	/* FIXME: HACK: dynamically sized array */
-	char result[num][CURRENT_MAX];
+	/* Allocate enough space for the number of list
+ 	   items we're going to be displaying */
+	result = malloc(num * sizeof(*result));
 
+	/* Open the terminal for input/output so we don't
+	   mess with stdin/stdout */
 	tty = fopen("/dev/tty","r+");
 	if(tty == NULL || errno == EINVAL) {
 		perror("fopen: /dev/tty");
 		exit(EXIT_FAILURE);
 	}
 
-	for(i=0;i < num; i++){
+	/* Print out all lines from STDIN */
+	for(i=0; i < num; i++) {
 		fgets(result[i],CURRENT_MAX,stdin);
 		if(feof(stdin) != 0) {
 			break;
@@ -44,26 +55,35 @@ int main (int argc, char ** argv ) {
 		fprintf(tty, "%d: %s",i,result[i]);
 	}
 
+	/* Prompt */
 	fprintf(tty, "Selection: ");
 
 	/* Get one line of input from the user and put it in inp */
 	fgets(inp,INPUT_MAX,tty);
 	fclose(tty);
 
+	/* Try to convert user input to int */
 	selection=strtol(inp,0,10);
 	if(errno == EINVAL) {
+		/* Not an int */
 		/* Commands Go Here */
 	} else {
+		/* Selection is the index the user chose
+		   check if the index is valid. */
 		if(selection < max && selection >= 0) {
+			/* chomp */
 			end = strchr(result[selection],'\n');
-			if(end!=0) {
+			if(end != 0) {
 				*end='\0';
 			}
+			/* print selected item to STDOUT */
 			printf(result[selection]);
 		} else {
+			/* User selected a bad index */
 			fprintf(stderr, "There is no item with the index %d\n", selection);
 		}
 	}
 
+	/* Boilerplate */
 	return 0;
 }
