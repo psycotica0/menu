@@ -22,8 +22,6 @@ int main (int argc, char ** argv ) {
 				fprintf(stderr,"Invalid Input: %s", argv[i]);
 				exit(EXIT_FAILURE);
 			}
-		} else {
-			command = argv[i];
 		}
 	}
 
@@ -31,11 +29,10 @@ int main (int argc, char ** argv ) {
 	char result[num][CURRENT_MAX];
 
 	tty = fopen("/dev/tty","r+");
-	if(tty == 0) {
+	if(tty == NULL || errno == EINVAL) {
 		perror("fopen: /dev/tty");
 		exit(EXIT_FAILURE);
 	}
-
 
 	for(i=0;i < num; i++){
 		fgets(result[i],CURRENT_MAX,stdin);
@@ -46,7 +43,6 @@ int main (int argc, char ** argv ) {
 		fprintf(tty, "%d: %s",i,result[i]);
 	}
 
-
 	fprintf(tty, "Selection: ");
 
 	/* Get one line of input from the user and put it in inp */
@@ -55,7 +51,7 @@ int main (int argc, char ** argv ) {
 	fclose(tty);
 
 	int selection=strtol(inp,0,10);
-	if(errno==EINVAL) {
+	if(errno == EINVAL) {
 		/* Commands Go Here */
 	} else {
 		if(selection < max && selection >= 0) {
@@ -63,14 +59,11 @@ int main (int argc, char ** argv ) {
 			if(end!=0) {
 				*end='\0';
 			}
-			char * output=malloc(strlen(command)+strlen(result[selection])+3);
-			sprintf(output, "%s \"%s\"",command,result[selection]);
-			system(output);
+			printf(result[selection]);
 		} else {
 			fprintf(stderr, "There is no item with the index %d\n", selection);
 		}
 	}
-
 
 	return 0;
 }
