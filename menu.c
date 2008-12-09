@@ -4,16 +4,17 @@
 #include <string.h>
 
 #define DEFAULT_NUM 15
-#define DEFAULT_COMMAND "vim -p"
 #define CURRENT_MAX 150
 #define INPUT_MAX 50
 
 int main (int argc, char ** argv ) {
-	char * command=DEFAULT_COMMAND;
+	char inp[INPUT_MAX];
+	char * end;
+	FILE * tty;
 	int num=DEFAULT_NUM;
 	int max=0;
 	int i;
-	FILE * tty;
+	int selection;
 
 	for(i=1; i < argc; i++) {
 		if(argv[i][0]=='-'){
@@ -46,16 +47,15 @@ int main (int argc, char ** argv ) {
 	fprintf(tty, "Selection: ");
 
 	/* Get one line of input from the user and put it in inp */
-	char inp[INPUT_MAX];
 	fgets(inp,INPUT_MAX,tty);
 	fclose(tty);
 
-	int selection=strtol(inp,0,10);
+	selection=strtol(inp,0,10);
 	if(errno == EINVAL) {
 		/* Commands Go Here */
 	} else {
 		if(selection < max && selection >= 0) {
-			char * end = strchr(result[selection],'\n');
+			end = strchr(result[selection],'\n');
 			if(end!=0) {
 				*end='\0';
 			}
