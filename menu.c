@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #define DEFAULT_NUM 15
 #define DEFAULT_COMMAND "vim -p"
+#define CURRENT_MAX 150
+#define INPUT_MAX 50
 
 int main (int argc, char ** argv ) {
 	char * command=DEFAULT_COMMAND;
@@ -12,7 +15,7 @@ int main (int argc, char ** argv ) {
 		if(argv[i][0]=='-'){
 			num=atoi(argv[i])*-1;
 			if (num==0) {
-				printf("Invalid Input: %s", argv[i]);
+				fprintf(stderr,"Invalid Input: %s", argv[i]);
 				exit(EXIT_FAILURE);
 			}
 		} else {
@@ -20,15 +23,15 @@ int main (int argc, char ** argv ) {
 		}
 	}
 
-	char result[num][150];
+	char result[num][CURRENT_MAX];
 	int max=0;
 
 	for(i=0;i < num; i++){
-		fgets(result[i],150,stdin);
-		max++;
+		fgets(result[i],CURRENT_MAX,stdin);
 		if( feof(stdin) != 0) {
 			break;
 		}
+		max++;
 		printf("%d: %s",i,result[i]);
 	}
 
@@ -38,12 +41,22 @@ int main (int argc, char ** argv ) {
 	if (secondIn == 0){
 		exit(EXIT_FAILURE);
 	}
-	char inp[50];
-	fgets(inp,50,secondIn);
+	char inp[INPUT_MAX];
+	fgets(inp,INPUT_MAX,secondIn);
 
-	int selection=atoi(inp);
-	if(selection==0){
+	int selection=strtol(inp,0,10);
+	if(errno==EINVAL) {
+		/* Commands Go Here */
+	} else {
+		if(selection < max && selection >= 0) {
+			/* Do Stuff */ 
+			printf("You Picked: %s",result[selection]);
+		} else {
+			fprintf(stderr, "There is no item with the index %d\n", selection);
+		}
 	}
+
+	fclose(secondIn);
 
 	return 0;
 }
