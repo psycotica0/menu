@@ -11,7 +11,9 @@
 int main (int argc, char ** argv ) {
 	char * command=DEFAULT_COMMAND;
 	int num=DEFAULT_NUM;
+	int max=0;
 	int i;
+	FILE * tty;
 
 	for(i=1; i < argc; i++) {
 		if(argv[i][0]=='-'){
@@ -25,28 +27,32 @@ int main (int argc, char ** argv ) {
 		}
 	}
 
+	/* FIXME: HACK: dynamically sized array */
 	char result[num][CURRENT_MAX];
-	int max=0;
+
+	tty = fopen("/dev/tty","r+");
+	if(tty == 0) {
+		perror("fopen: /dev/tty");
+		exit(EXIT_FAILURE);
+	}
+
 
 	for(i=0;i < num; i++){
 		fgets(result[i],CURRENT_MAX,stdin);
-		if( feof(stdin) != 0) {
+		if(feof(stdin) != 0) {
 			break;
 		}
 		max++;
-		printf("%d: %s",i,result[i]);
+		fprintf(tty, "%d: %s",i,result[i]);
 	}
 
-	printf("Selection: ");
 
-	FILE * secondIn = fopen("/dev/tty","r");
-	if (secondIn == 0){
-		perror("Couldn't Open /dev/tty");
-		exit(EXIT_FAILURE);
-	}
+	fprintf(tty, "Selection: ");
+
+	/* Get one line of input from the user and put it in inp */
 	char inp[INPUT_MAX];
-	fgets(inp,INPUT_MAX,secondIn);
-	fclose(secondIn);
+	fgets(inp,INPUT_MAX,tty);
+	fclose(tty);
 
 	int selection=strtol(inp,0,10);
 	if(errno==EINVAL) {
@@ -58,7 +64,7 @@ int main (int argc, char ** argv ) {
 				*end='\0';
 			}
 			char * output=malloc(strlen(command)+strlen(result[selection])+3);
-			sprintf(output,"%s \"%s\"",command,result[selection]);
+			sprintf(output, "%s \"%s\"",command,result[selection]);
 			system(output);
 		} else {
 			fprintf(stderr, "There is no item with the index %d\n", selection);
