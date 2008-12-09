@@ -1,8 +1,8 @@
 menu: menu.o
-	gcc -lncurses -o menu menu.o
+	gcc -o menu menu.o
 
 menu.o: menu.c
-	gcc -c -o menu.o menu.c
+	gcc -c -Wall -o menu.o menu.c
 
 .PHONY: clean test run
 
