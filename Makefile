@@ -2,7 +2,7 @@ menu: menu.o
 	gcc -o menu menu.o
 
 menu.o: menu.c
-	gcc -c -Wall -o menu.o menu.c
+	gcc -c -Wall -ansi -pedantic -o menu.o menu.c
 
 .PHONY: clean test run
 
