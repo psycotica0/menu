@@ -73,6 +73,10 @@ int main (int argc, char ** argv ) {
 	if(errno == EINVAL) {
 		/* Not an int */
 		/* Commands Go Here */
+		/* The 'a' command outputs every line*/
+		for(i=0;i<max; i++){
+			printf("%s",result[i]);
+		}
 	} else {
 		/* Selection is the index the user chose
 		   check if the index is valid. */
