@@ -69,8 +69,8 @@ int main (int argc, char ** argv ) {
 	fclose(tty);
 
 	/* Try to convert user input to int */
-	selection=strtol(inp,0,10);
-	if(errno == EINVAL) {
+	selection=strtol(inp,&end,10);
+	if(end == inp) {
 		/* Not an int */
 		/* Commands Go Here */
 		/* The 'a' command outputs every line*/
