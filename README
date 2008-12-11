@@ -1,0 +1,19 @@
+This project is an interactive filter for pipes that enumerates stdin, and lets you pick the lines that go to stdout.
+
+Currently these features are supported:
+- Support multiple selections with comma separated syntax
+	ex.
+	Selection: 5,3,0
+	Line5
+	Line3
+	Line0
+
+- Support multiple selections appended to one another with '+' separated syntax.
+	ex.
+	Selection: 5 + 3 + 0
+	Line5 Line3 Line0
+
+- Support an "a" as a selection for all, which just spits out the list (only the number enumerated)
+  At this point it would basically be like "head -nNUM"
+  The difference is that you got so see what it was sending through first, and optionally decide to send only part, or nothing at all
+
