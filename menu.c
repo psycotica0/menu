@@ -113,6 +113,11 @@ int main (int argc, char ** argv ) {
 					lineStarter='\n';
 					/* Set iterator to the next char */
 					iterator=end+1;
+				} else if (*end == '+') {
+					/* The '+' command I love too. See ',' command. */
+					lineStarter=' ';
+					/* Set iterator to the next char */
+					iterator=end+1;
 				} else {
 					/* If I don't recognize it, end */
 					fprintf(stderr,"Unrecognized Command %c\n", *end);
@@ -133,6 +138,13 @@ int main (int argc, char ** argv ) {
 					/* User selected a bad index */
 					fprintf(stderr, "There is no item with the index %d\n", selection);
 				}
+				/*
+				This is actually kind of a hack
+				If I were to select 1+2, which I get is "1" and "+2", which is parsed as "2".
+				So, the default behaviour will actaully be "+", but it's only accessed if you break the numbers up with something that gets consumed without changing the value of the number
+				This mostly leaves '+'. Maybe '.', I'm not sure.
+				*/
+				lineStarter=' ';
 				iterator=end;
 			}
 		}
