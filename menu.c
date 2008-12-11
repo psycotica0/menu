@@ -73,9 +73,11 @@ int main (int argc, char ** argv ) {
 	if(end == inp) {
 		/* Not an int */
 		/* Commands Go Here */
-		/* The 'a' command outputs every line*/
-		for(i=0;i<max; i++){
-			printf("%s",result[i]);
+		if(*end == 'a') {
+			/* The 'a' command outputs every line*/
+			for(i=0;i<max; i++){
+				printf("%s",result[i]);
+			}
 		}
 	} else {
 		/* Selection is the index the user chose
