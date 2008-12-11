@@ -13,4 +13,4 @@ clean:
 test: run clean
 
 run: menu
-	./menu
+	ls | ./menu
