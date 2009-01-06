@@ -23,12 +23,12 @@ void chomp (char * inp) {
 	}
 }
 
-/* This function takes in a string and prints it out, escpaing spaces */
+/* This function takes in a string and prints it out, escaping spaces and quotes */
 void printWithEscape (char * inp) {
 	int i=0;
 	int length= strlen(inp);
 	for (;i<length;i++){
-		if (inp[i]==' '){
+		if (inp[i]==' ' || inp[i]=='"' || inp[i]=='\'') {
 			putchar('\\');
 		}
 		putchar(inp[i]);
