@@ -13,4 +13,4 @@ clean:
 test: run clean
 
 run: menu
-	ls | ./menu
+	ls | ./menu | xargs ls -l
