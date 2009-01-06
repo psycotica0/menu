@@ -23,6 +23,18 @@ void chomp (char * inp) {
 	}
 }
 
+/* This function takes in a string and prints it out, escpaing spaces */
+void printWithEscape (char * inp) {
+	int i=0;
+	int length= strlen(inp);
+	for (;i<length;i++){
+		if (inp[i]==' '){
+			putchar('\\');
+		}
+		putchar(inp[i]);
+	}
+}
+
 /* Print a usage message to stderr */
 void usage() {
 	fprintf(stderr, "This function is used as a filter in a pipe from stdin to stdout.\n\
@@ -153,7 +165,11 @@ int main (int argc, char ** argv ) {
 					if (lineStarter!=0) {
 						putchar(lineStarter);
 					}
-					printf(result[selection]);
+					if (Escape) {
+						printWithEscape(result[selection]);
+					} else {
+						printf(result[selection]);
+					}
 				} else {
 					/* User selected a bad index */
 					fprintf(stderr, "There is no item with the index %d\n", selection);
