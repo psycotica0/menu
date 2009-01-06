@@ -40,7 +40,7 @@ void usage() {
 	fprintf(stderr, "This function is used as a filter in a pipe from stdin to stdout.\n\
  Options:\n\
   -n NUM Specifies the number of entries to display\n\
-  -e     Flag that tells whether the output should be escaped or not\n");
+  -r     Raw output. Doesn't escape any characters\n");
 }
 
 int main (int argc, char ** argv ) {
@@ -60,20 +60,22 @@ int main (int argc, char ** argv ) {
 	int selection;
 	char * optString = "n:e";
 	char optFlag;
-	int Escape=0;
+	int Escape=1;
 
 	/* Process command line arguments */
 	while ((optFlag=getopt(argc, argv, optString))!=-1){
 		switch(optFlag) {
 			case 'n':
+				/* Get the number to display */
 				num=atoi(optarg);
 				if (num==0) {
 					fprintf(stderr,"Invalid Input: %s", argv[i]);
 					exit(EXIT_FAILURE);
 				}
 				break;
-			case 'e':
-				Escape=1;
+			case 'r':
+				/* Raw ouput */
+				Escape=0;
 				break;
 			case '?':
 			default:
@@ -135,7 +137,11 @@ int main (int argc, char ** argv ) {
 					/* The 'a' command outputs every line*/
 					/* 'a' is only valid if it's the first, thus the lineStarter check*/
 					for(i=0;i<max; i++){
-						printf("%s",result[i]);
+						if (Escape) {
+							printWithEscape(result[i]);
+						} else {
+							printf("%s",result[i]);
+						}
 					}
 					/* After a, no more input is accepted */
 					break;
