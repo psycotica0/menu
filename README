@@ -17,3 +17,9 @@ Currently these features are supported:
   At this point it would basically be like "head -nNUM"
   The difference is that you got so see what it was sending through first, and optionally decide to send only part, or nothing at all
 
+- Escape some characters
+	For now, the -e flag is required to escpape these characters.
+	I'm considering making it on by default.
+	ex.
+	echo "~/JoJo's Pictures" | menu 
+	JoJo\'s\ Pictures

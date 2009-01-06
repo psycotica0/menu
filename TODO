@@ -1,11 +1,5 @@
 These are the features I intend to implement before declaring the project done.
 
-- Escape some characters
-  Perhaps make a flag to escape them, or a flag to not escape them
-	ex.
-	echo "~/JoJo's Pictures" | menu 
-	JoJo\'s\ Pictures
-
 - Stephen thinks this is a dumb feature, but I might consider adding ranges.
 	ex.
 	Selection: 2..6
