@@ -58,12 +58,11 @@ int main (int argc, char ** argv ) {
 	int max=0;
 	int i;
 	int selection;
-	char * optString = "n:e";
 	char optFlag;
 	int Escape=1;
 
 	/* Process command line arguments */
-	while ((optFlag=getopt(argc, argv, optString))!=-1){
+	while ((optFlag=getopt(argc, argv,  "n:e"))!=-1){
 		switch(optFlag) {
 			case 'n':
 				/* Get the number to display */
