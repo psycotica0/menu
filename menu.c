@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <unistd.h>
 
 #define DEFAULT_NUM 15
 #define CURRENT_MAX 150
@@ -21,6 +22,15 @@ void chomp (char * inp) {
 		*end='\0';
 	}
 }
+
+/* Print a usage message to stderr */
+void usage() {
+	fprintf(stderr, "This function is used as a filter in a pipe from stdin to stdout.\n\
+ Options:\n\
+  -n NUM Specifies the number of entries to display\n\
+  -e     Flag that tells whether the output should be escaped or not\n");
+}
+
 int main (int argc, char ** argv ) {
 
 	/* manymany decls */
@@ -36,18 +46,28 @@ int main (int argc, char ** argv ) {
 	int max=0;
 	int i;
 	int selection;
+	char * optString = "n:e";
+	char optFlag;
+	int Escape=0;
 
-	/* Process command line arguments
-	*  we currently only support -##
-	*  FIXME: should have usage message.
-	*/
-	for(i=1; i < argc; i++) {
-		if(argv[i][0]=='-'){
-			num=atoi(argv[i])*-1;
-			if (num==0) {
-				fprintf(stderr,"Invalid Input: %s", argv[i]);
-				exit(EXIT_FAILURE);
-			}
+	/* Process command line arguments */
+	while ((optFlag=getopt(argc, argv, optString))!=-1){
+		switch(optFlag) {
+			case 'n':
+				num=atoi(optarg);
+				if (num==0) {
+					fprintf(stderr,"Invalid Input: %s", argv[i]);
+					exit(EXIT_FAILURE);
+				}
+				break;
+			case 'e':
+				Escape=1;
+				break;
+			case '?':
+			default:
+				usage();
+				return 0;
+				break;
 		}
 	}
 
