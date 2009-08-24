@@ -123,7 +123,7 @@ int main (int argc, char ** argv ) {
 	int Escape=1;
 
 	/* Process command line arguments */
-	while ((optFlag=getopt(argc, argv,  "n:e"))!=-1){
+	while ((optFlag=getopt(argc, argv,  "n:r"))!=-1){
 		switch(optFlag) {
 			case 'n':
 				/* Get the number to display */
