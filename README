@@ -17,9 +17,13 @@ Currently these features are supported:
   At this point it would basically be like "head -nNUM"
   The difference is that you got so see what it was sending through first, and optionally decide to send only part, or nothing at all
 
+- Support use of NUL instead of newline as input/output item delimiter
+  This is useful with input/output data that can include '\n'.
+  Use -0 to turn this on.
+
 - Escape some characters
-	For now, the -e flag is required to escpape these characters.
-	I'm considering making it on by default.
+	This is on by default.  Use -r to turn it off.
+	(It is also forcibly turned off by -0.)
 	ex.
 	echo "~/JoJo's Pictures" | menu 
 	JoJo\'s\ Pictures
