@@ -156,6 +156,9 @@ int main (int argc, char ** argv ) {
 	/* Slurp all input from stdin */
 	slurp();
 
+	if(nlines > num)
+		nlines=num;
+
 	/* Print out all lines from STDIN */
 	for(i=0; i < nlines; i++) {
 		fprintf(tty, "%d: %s\n",i,lines[i]);
