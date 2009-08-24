@@ -121,6 +121,7 @@ int main (int argc, char ** argv ) {
 	int selection;
 	char optFlag;
 	int Escape=1;
+	int need_newline=0;
 
 	/* Process command line arguments */
 	while ((optFlag=getopt(argc, argv,  "n:r"))!=-1){
@@ -232,6 +233,7 @@ int main (int argc, char ** argv ) {
 					} else {
 						printf(lines[selection]);
 					}
+					need_newline=1;
 				} else {
 					/* User selected a bad index */
 					fprintf(stderr, "There is no item with the index %d\n", selection);
@@ -247,6 +249,8 @@ int main (int argc, char ** argv ) {
 			}
 		}
 	}
+	if(need_newline)
+		putchar('\n');
 
 	/* Boilerplate */
 	return 0;
