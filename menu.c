@@ -14,13 +14,76 @@
 #define CURRENT_MAX 150
 #define INPUT_MAX 50
 
-/* This function takes the newline off a string, if it exists */
-void chomp (char * inp) {
-	char * end;
-	end = strchr(inp,'\n');
-	if(end != 0) {
-		*end='\0';
+char **lines;	/*Lines read from stdin*/
+size_t nlines;	/*Number of lines in lines[]*/
+
+/* This function slurps all the data from stdin, and stuffs it into lines[] */
+void slurp (void) {
+	size_t maxlines;
+	char *readbuf;
+	size_t maxread,nread;
+	int c;
+
+	nlines=maxlines=0;
+	readbuf=malloc(maxread=128);
+	if (readbuf == NULL) {
+		perror("malloc");
+		exit(EXIT_FAILURE);
 	}
+	nread=0;
+
+	while ((c=getchar()) != EOF) {
+		if (c == '\n') {
+			/*End of line*/
+			readbuf[nread++]='\0';
+			if (nlines >= maxlines) {
+				/*Grow lines[]*/
+				maxread *= 2;
+				lines = realloc(lines,maxread*sizeof *lines);
+				if (!lines) {
+					perror("realloc");
+					exit(EXIT_FAILURE);
+				}
+			}
+			lines[nlines++] = strdup(readbuf);
+			nread=0;
+		}
+		else
+		{
+			readbuf[nread++] = c;
+			if (nread >= maxread) {
+				/* Grow after stuffing another character in.
+				   This ensures there's room for the '\0'. */
+				maxread *= 2;
+				readbuf = realloc(readbuf,maxread);
+				if (!readbuf) {
+					perror("realloc");
+					exit(EXIT_FAILURE);
+				}
+			}
+		}
+	}
+
+	if (ferror(stdin)) {
+		perror("<stdin>");
+		exit(EXIT_FAILURE);
+	}
+
+	if (nread) {
+		/* Last item read didn't end with a newline.  Don't lose it. */
+		if (nlines >= maxlines) {
+			/*Grow lines[]*/
+			maxread *= 2;
+			lines = realloc(lines,maxread*sizeof *lines);
+			if (!lines) {
+				perror("realloc");
+				exit(EXIT_FAILURE);
+			}
+		}
+		lines[nlines++] = strdup(readbuf);
+	}
+
+	free(readbuf);
 }
 
 /* This function takes in a string and prints it out, escaping spaces and quotes */
@@ -46,7 +109,6 @@ void usage() {
 int main (int argc, char ** argv ) {
 
 	/* manymany decls */
-	char (*result)[CURRENT_MAX];
 	char inp[INPUT_MAX];
 	char * end;
 	char * iterator;
@@ -55,7 +117,6 @@ int main (int argc, char ** argv ) {
 	char lineStarter=0;
 	FILE * tty;
 	int num=DEFAULT_NUM;
-	int max=0;
 	int i;
 	int selection;
 	char optFlag;
@@ -84,10 +145,6 @@ int main (int argc, char ** argv ) {
 		}
 	}
 
-	/* Allocate enough space for the number of list
- 	   items we're going to be displaying */
-	result = malloc(num * sizeof(*result));
-
 	/* Open the terminal for input/output so we don't
 	   mess with stdin/stdout */
 	tty = fopen("/dev/tty","r+");
@@ -96,14 +153,12 @@ int main (int argc, char ** argv ) {
 		exit(EXIT_FAILURE);
 	}
 
+	/* Slurp all input from stdin */
+	slurp();
+
 	/* Print out all lines from STDIN */
-	for(i=0; i < num; i++) {
-		fgets(result[i],CURRENT_MAX,stdin);
-		if(feof(stdin) != 0) {
-			break;
-		}
-		max++;
-		fprintf(tty, "%d: %s",i,result[i]);
+	for(i=0; i < nlines; i++) {
+		fprintf(tty, "%d: %s\n",i,lines[i]);
 	}
 
 	/* Prompt */
@@ -135,12 +190,13 @@ int main (int argc, char ** argv ) {
 				} else if(*end == 'a' && lineStarter==0) {
 					/* The 'a' command outputs every line*/
 					/* 'a' is only valid if it's the first, thus the lineStarter check*/
-					for(i=0;i<max; i++){
+					for(i=0;i<nlines; i++){
 						if (Escape) {
-							printWithEscape(result[i]);
+							printWithEscape(lines[i]);
 						} else {
-							printf("%s",result[i]);
+							printf("%s",lines[i]);
 						}
+						putchar('\n');
 					}
 					/* After a, no more input is accepted */
 					break;
@@ -163,17 +219,15 @@ int main (int argc, char ** argv ) {
 			} else {
 				/* Selection is the index the user chose
 					 check if the index is valid. */
-				if(selection < max && selection >= 0) {
-					/* chomp */
-					chomp(result[selection]);
+				if(selection < nlines && selection >= 0) {
 					/* print selected item to STDOUT */
 					if (lineStarter!=0) {
 						putchar(lineStarter);
 					}
 					if (Escape) {
-						printWithEscape(result[selection]);
+						printWithEscape(lines[selection]);
 					} else {
-						printf(result[selection]);
+						printf(lines[selection]);
 					}
 				} else {
 					/* User selected a bad index */
