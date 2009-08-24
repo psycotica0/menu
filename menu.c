@@ -14,6 +14,7 @@
 #define CURRENT_MAX 150
 #define INPUT_MAX 50
 
+int delim='\n';	/*Delimiter for input/output items*/
 char **lines;	/*Lines read from stdin*/
 size_t nlines;	/*Number of lines in lines[]*/
 
@@ -33,7 +34,7 @@ void slurp (void) {
 	nread=0;
 
 	while ((c=getchar()) != EOF) {
-		if (c == '\n') {
+		if (c == delim) {
 			/*End of line*/
 			readbuf[nread++]='\0';
 			if (nlines >= maxlines) {
@@ -103,7 +104,8 @@ void usage() {
 	fprintf(stderr, "This function is used as a filter in a pipe from stdin to stdout.\n\
  Options:\n\
   -n NUM Specifies the number of entries to display\n\
-  -r     Raw output. Doesn't escape any characters\n");
+  -r     Raw output. Doesn't escape any characters\n\
+  -0     Use NUL instead of newline as delimiter (implies -r)\n");
 }
 
 int main (int argc, char ** argv ) {
@@ -114,7 +116,7 @@ int main (int argc, char ** argv ) {
 	char * iterator;
 	/* This variable is used to hold the character that will start a line*/
 	/* Used in the ',' causing newline and '+' causing space case */
-	char lineStarter=0;
+	char lineStarter=-1;
 	FILE * tty;
 	int num=DEFAULT_NUM;
 	int i;
@@ -124,7 +126,7 @@ int main (int argc, char ** argv ) {
 	int need_newline=0;
 
 	/* Process command line arguments */
-	while ((optFlag=getopt(argc, argv,  "n:r"))!=-1){
+	while ((optFlag=getopt(argc, argv,  "n:r0"))!=-1){
 		switch(optFlag) {
 			case 'n':
 				/* Get the number to display */
@@ -134,6 +136,10 @@ int main (int argc, char ** argv ) {
 					exit(EXIT_FAILURE);
 				}
 				break;
+			case '0':
+				/* NUL instead of newline as delimiter */
+				delim='\0';
+				/* fall through - -0 implies -r */
 			case 'r':
 				/* Raw ouput */
 				Escape=0;
@@ -191,7 +197,7 @@ int main (int argc, char ** argv ) {
 					/* We're Done Here */
 					break;
 					/* I love the null command */
-				} else if(*end == 'a' && lineStarter==0) {
+				} else if(*end == 'a' && lineStarter==-1) {
 					/* The 'a' command outputs every line*/
 					/* 'a' is only valid if it's the first, thus the lineStarter check*/
 					for(i=0;i<nlines; i++){
@@ -200,14 +206,14 @@ int main (int argc, char ** argv ) {
 						} else {
 							printf("%s",lines[i]);
 						}
-						putchar('\n');
+						putchar(delim);
 					}
 					/* After a, no more input is accepted */
 					break;
 				} else if (*end == ',') {
 					/* The ',' command is one of those things that I love */
 					/* At first it doesn't seem like a command, but really it is. */
-					lineStarter='\n';
+					lineStarter=delim;
 					/* Set iterator to the next char */
 					iterator=end+1;
 				} else if (*end == '+') {
@@ -225,7 +231,7 @@ int main (int argc, char ** argv ) {
 					 check if the index is valid. */
 				if(selection < nlines && selection >= 0) {
 					/* print selected item to STDOUT */
-					if (lineStarter!=0) {
+					if (lineStarter!=-1) {
 						putchar(lineStarter);
 					}
 					if (Escape) {
@@ -250,7 +256,7 @@ int main (int argc, char ** argv ) {
 		}
 	}
 	if(need_newline)
-		putchar('\n');
+		putchar(delim);
 
 	/* Boilerplate */
 	return 0;
